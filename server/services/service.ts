@@ -1,31 +1,11 @@
 import * as admin from 'firebase-admin';
 import * as apn from '@parse/node-apn';
 
-export interface NotificationService {
-    sendNotification(platform: string, token: string, payload: any): Promise<void>;
+export interface INotificationService {
+    sendNotification(token: string, payload: any): Promise<void>;
 }
 
-export class NotificationServiceImpl implements NotificationService {
-    private firebaseService: FirebaseNotificationService;
-    private apnService: APNNotificationService;
-
-    constructor() {
-        this.firebaseService = new FirebaseNotificationService();
-        this.apnService = new APNNotificationService();
-    }
-
-    async sendNotification(platform: string, token: string, payload: any): Promise<void> {
-        if (platform === 'android') {
-            await this.firebaseService.sendNotification(token, payload);
-        } else if (platform === 'ios') {
-            await this.apnService.sendNotification(token, payload);
-        } else {
-            throw new Error('Invalid platform specified');
-        }
-    }
-}
-
-class FirebaseNotificationService {
+class FirebaseNotificationService implements INotificationService {
     async sendNotification(token: string, payload: any): Promise<void> {
         const message = {
             data: payload,
@@ -36,7 +16,7 @@ class FirebaseNotificationService {
     }
 }
 
-class APNNotificationService {
+class APNNotificationService implements INotificationService {
     private apnProvider: apn.Provider;
 
     constructor() {
@@ -61,5 +41,22 @@ class APNNotificationService {
         });
 
         await this.apnProvider.send(note, token);
+    }
+}
+
+export class NotificationServiceFactory {
+    static getNotificationService(platform: string): INotificationService {
+        if (platform === 'android') {
+            return new FirebaseNotificationService();
+        } else if (platform === 'ios') {
+            return new APNNotificationService();
+        } else {
+            throw new Error('Invalid platform specified');
+        }
+    }
+
+    static async sendNotification(platform: string, token: string, payload: any): Promise<void> {
+        const service = this.getNotificationService(platform);
+        await service.sendNotification(token, payload);
     }
 }
