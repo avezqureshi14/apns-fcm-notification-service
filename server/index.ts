@@ -4,7 +4,6 @@ import { router as notificationRouter } from './routes/notification';
 const app = express();
 app.use(express.json());
 
-// Route for handling notifications
 app.use('/api/v1/notifications', notificationRouter);
 
 const PORT = process.env.PORT || 3000;
