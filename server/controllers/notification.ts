@@ -1,24 +1,16 @@
 import { Request, Response } from 'express';
-import { NotificationService, FirebaseNotificationService, APNNotificationService } from '../services/service';
+import { NotificationService } from '../services/service';
+import { getNotificationService } from '../helper/notification';
 
-const firebaseNotificationService = new FirebaseNotificationService();
-const apnNotificationService = new APNNotificationService();
-
-export const sendNotification = async (req: Request, res: Response): Promise<void> => {
+export const sendNotification = async (req: Request, res: Response, firebaseService: NotificationService, apnService: NotificationService): Promise<void> => {
     const { token, payload, platform } = req.body;
 
+    const notificationService = getNotificationService(platform, firebaseService, apnService);
+    if (!notificationService) {
+        res.status(400).send('Invalid platform specified');
+        return;
+    }
     try {
-        let notificationService: NotificationService;
-
-        if (platform === 'android') {
-            notificationService = firebaseNotificationService;
-        } else if (platform === 'ios') {
-            notificationService = apnNotificationService;
-        } else {
-            res.status(400).send('Invalid platform specified');
-            return;
-        }
-
         await notificationService.sendNotification(token, payload);
         res.status(200).send('Notification sent successfully');
     } catch (error) {
