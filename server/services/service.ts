@@ -54,9 +54,11 @@ export class NotificationServiceFactory {
             throw new Error('Invalid platform specified');
         }
     }
+}
 
+export class NotificationService {
     static async sendNotification(platform: string, token: string, payload: any): Promise<void> {
-        const service = this.getNotificationService(platform);
+        const service = NotificationServiceFactory.getNotificationService(platform);
         await service.sendNotification(token, payload);
     }
 }
