@@ -1,9 +1,19 @@
 import * as admin from 'firebase-admin';
 import * as apn from '@parse/node-apn';
-
+const path = require('path')
+const serviceAccount = require('./api-project-893757878307-firebase-adminsdk-yl6ee-bf8fda3836.json');
+const p8FilePath = path.join(__dirname, 'AuthKey_7NYZ45GBNB.p8');
 export interface INotificationService {
     sendNotification(token: string, payload: any): Promise<void>;
 }
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+});
+
+
+//we provide option to change this keys
+//title - avez : content_title-title
 
 class FirebaseNotificationService implements INotificationService {
     async sendNotification(token: string, payload: any): Promise<void> {
@@ -22,11 +32,11 @@ class APNNotificationService implements INotificationService {
     constructor() {
         this.apnProvider = new apn.Provider({
             token: {
-                key: process.env.APN_KEY_PATH || 'path/to/APNsAuthKey_XXXXXXXXXX.p8',
-                keyId: process.env.APN_KEY_ID || 'YOUR_KEY_ID',
-                teamId: process.env.APN_TEAM_ID || 'YOUR_TEAM_ID',
+                key: p8FilePath,
+                keyId: '7NYZ45GBNB',
+                teamId: 'Q283KSLU7N',
             },
-            production: process.env.NODE_ENV === 'production',
+            production: false,
         });
     }
 

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { NotificationService } from '../services/service';
+import { NotificationService } from '../services/notification/service';
 
 export const sendNotification = async (req: Request, res: Response): Promise<void> => {
     const { token, payload, platform } = req.body;

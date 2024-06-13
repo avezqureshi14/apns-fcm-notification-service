@@ -1,4 +1,5 @@
-import express, { Request, Response } from 'express';
+const express = require("express")
+import { Request, Response } from 'express';
 import { sendNotification } from '../controllers/notification';
 
 export const router = express.Router();
